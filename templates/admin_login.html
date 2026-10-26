@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% block title %}Yönetici | ÇCSAL E-Spor{% endblock %}
+{% block content %}
+<section class="page-intro"><div class="eyebrow">YÖNETİM PANELİ</div><h1>Yönetici <em>erişimi.</em></h1><p>Yalnızca turnuva yöneticisinin belirlediği anahtarla giriş yapılabilir.</p></section>
+<form class="form-card" method="post">
+  <div class="form-grid">
+    <label class="full">Yönetici anahtarı<input type="password" name="key" autocomplete="current-password" placeholder="Render ortam değişkeni ADMIN_KEY" required></label>
+  </div>
+  <div class="form-foot"><p>Bu anahtarı takım kaptanlarıyla veya herkese açık bir yerde paylaşma.</p><button class="btn primary" type="submit">Giriş yap ↗</button></div>
+</form>
+{% endblock %}

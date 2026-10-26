@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}ÇCSAL E-Spor{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar"><a class="brand" href="{{ url_for('index') }}"><span class="brand-mark">Ç</span><span>ÇCSAL <b>E-SPOR</b></span></a>
+<nav><a href="{{ url_for('index') }}">Turnuva</a><a href="{{ url_for('apply') }}">Takım Başvurusu</a></nav></header>
+<main class="container">
+{% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}<div class="notice {{ category }}">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}
+{% block content %}{% endblock %}
+</main>
+<footer>ÇCSAL E-Spor · Sınıflar Arası VALORANT Turnuvası <span>BO3 · Lig Usulü</span></footer>
+</body></html>

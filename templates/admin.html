@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% block title %}Yönetim Paneli | ÇCSAL E-Spor{% endblock %}
+{% block content %}
+<section class="page-intro"><div class="eyebrow">YÖNETİM PANELİ</div><h1>Turnuvayı <em>yönet.</em></h1><p>Başvuruları onayla, reddet ve BO3 maç sonuçlarını kaydet.</p></section>
+<section class="section"><div class="section-head"><div><div class="eyebrow">İNCELEME</div><h2>Bekleyen başvurular <span class="count">{{ pending|length }}</span></h2></div></div>
+{% for t in pending %}<article class="admin-card"><div><h3>{{ t.class_name }} <span class="muted">· Kaptan: {{ t.captain }}</span></h3><p>{{ t.player1 }}, {{ t.player2 }}, {{ t.player3 }}, {{ t.player4 }}, {{ t.player5 }} · Yedek: {{ t.substitute }}</p><small>İletişim: {{ t.contact }}{% if t.note %} · Not: {{ t.note }}{% endif %}</small></div><div class="inline-actions"><form method="post"><input type="hidden" name="team_id" value="{{ t.id }}"><button class="btn small primary" name="action" value="approve">Onayla</button></form><form method="post"><input type="hidden" name="team_id" value="{{ t.id }}"><button class="btn small danger" name="action" value="reject">Reddet</button></form></div></article>{% else %}<div class="empty compact"><p>Bekleyen başvuru yok.</p></div>{% endfor %}</section>
+<section class="section"><div class="section-head"><div><div class="eyebrow">MAÇ SONUCU</div><h2>BO3 sonucu ekle</h2></div></div>
+{% if teams|length >= 2 %}<form class="form-card" method="post"><input type="hidden" name="action" value="result"><div class="form-grid">
+<label>Takım A *<select name="team_a" required>{% for t in teams %}<option value="{{ t.id }}">{{ t.class_name }}</option>{% endfor %}</select></label>
+<label>Takım B *<select name="team_b" required>{% for t in teams %}<option value="{{ t.id }}">{{ t.class_name }}</option>{% endfor %}</select></label>
+<label>Takım A harita galibiyeti *<select name="score_a"><option>2</option><option>1</option><option>0</option></select></label>
+<label>Takım B harita galibiyeti *<select name="score_b"><option>0</option><option>1</option><option>2</option></select></label>
+<label class="full">Not (isteğe bağlı)<input name="note" placeholder="Örn. 1. hafta maçı"></label></div><div class="form-foot"><p>Geçerli BO3 skoru 2-0 veya 2-1 / 1-2 / 0-2 şeklindedir.</p><button class="btn primary">Sonucu kaydet</button></div></form>{% else %}<p class="muted">Sonuç girebilmek için en az iki onaylı takım gerekli.</p>{% endif %}
+</section>
+<section class="section"><div class="section-head"><div><div class="eyebrow">KAYITLI SONUÇLAR</div><h2>Son maçlar</h2></div></div>
+{% for r in results %}<article class="admin-card"><h3>{{ r.a_name }} <strong>{{ r.score_a }} - {{ r.score_b }}</strong> {{ r.b_name }}</h3><form method="post"><input type="hidden" name="action" value="delete_result"><input type="hidden" name="result_id" value="{{ r.id }}"><button class="btn small danger">Sonucu sil</button></form></article>{% else %}<p class="muted">Henüz sonuç girilmedi.</p>{% endfor %}
+</section>
+<p class="admin-warning">Güvenlik notu: Bu panel yalnızca yerel demo içindir. İnternete açmadan önce gerçek yönetici girişi, güçlü parola ve HTTPS eklenmelidir.</p>
+{% endblock %}

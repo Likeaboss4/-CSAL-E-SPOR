@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Takım Başvurusu | ÇCSAL E-Spor{% endblock %}
+{% block content %}
+<section class="page-intro"><div class="eyebrow">KAYIT MERKEZİ</div><h1>Sınıfını <em>turnuvaya yazdır.</em></h1><p>Başvuruyu takım kaptanı doldurmalı. Tüm oyuncu adlarını ve iletişim bilgisini doğru gir.</p></section>
+<form class="form-card" method="post">
+<div class="form-section-title"><span>01</span><div><h2>Takım bilgileri</h2><p>Sınıf ve kaptan bilgilerini yaz.</p></div></div>
+<div class="form-grid">
+<label>Sınıf adı *<input name="class_name" placeholder="Örn. 10/A" required></label>
+<label>Takım kaptanı *<input name="captain" placeholder="Ad Soyad" required></label>
+<label class="full">Kaptanın iletişim bilgisi *<input name="contact" placeholder="Okul e-postası veya uygun iletişim bilgisi" required><small>Bu bilgi herkese açık gösterilmez.</small></label>
+</div>
+<div class="form-section-title"><span>02</span><div><h2>Oyuncu kadrosu</h2><p>5 as oyuncu ve 1 yedek zorunludur.</p></div></div>
+<div class="form-grid">
+<label>Oyuncu 1 *<input name="player1" placeholder="Ad Soyad" required></label>
+<label>Oyuncu 2 *<input name="player2" placeholder="Ad Soyad" required></label>
+<label>Oyuncu 3 *<input name="player3" placeholder="Ad Soyad" required></label>
+<label>Oyuncu 4 *<input name="player4" placeholder="Ad Soyad" required></label>
+<label>Oyuncu 5 *<input name="player5" placeholder="Ad Soyad" required></label>
+<label>Yedek oyuncu *<input name="substitute" placeholder="Ad Soyad" required></label>
+<label class="full">Yöneticiye not (isteğe bağlı)<textarea name="note" rows="3" placeholder="Varsa notun..."></textarea></label>
+</div>
+<div class="form-foot"><p>Başvuru önce incelemeye alınır. Onaylanan takımlar turnuva sayfasında görünür.</p><button class="btn primary" type="submit">Başvuruyu gönder <span>↗</span></button></div>
+</form>
+{% endblock %}
