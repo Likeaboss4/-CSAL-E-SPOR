@@ -1,24 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Takım Başvurusu | ÇCSAL E-Spor{% endblock %}
+{% block title %}Takım Başvurusu | ŞCSAL E-Spor{% endblock %}
 {% block content %}
-<section class="page-intro"><div class="eyebrow">KAYIT MERKEZİ</div><h1>Sınıfını <em>turnuvaya yazdır.</em></h1><p>Başvuruyu takım kaptanı doldurmalı. Tüm oyuncu adlarını ve iletişim bilgisini doğru gir.</p></section>
-<form class="form-card" method="post">
-<div class="form-section-title"><span>01</span><div><h2>Takım bilgileri</h2><p>Sınıf ve kaptan bilgilerini yaz.</p></div></div>
+<section class="page-intro"><p class="kicker">TAKIM KAYDI</p><h1>Turnuvaya katıl<span>.</span></h1><p>Formu takım kaptanı doldursun. Başvurun yönetici onayından sonra yayımlanır.</p></section>
+<form class="form-panel" method="post">
 <div class="form-grid">
-<label>Sınıf adı *<input name="class_name" placeholder="Örn. 10/A" required></label>
-<label>Takım kaptanı *<input name="captain" placeholder="Ad Soyad" required></label>
-<label class="full">Kaptanın iletişim bilgisi *<input name="contact" placeholder="Okul e-postası veya uygun iletişim bilgisi" required><small>Bu bilgi herkese açık gösterilmez.</small></label>
-</div>
-<div class="form-section-title"><span>02</span><div><h2>Oyuncu kadrosu</h2><p>5 as oyuncu ve 1 yedek zorunludur.</p></div></div>
-<div class="form-grid">
-<label>Oyuncu 1 *<input name="player1" placeholder="Ad Soyad" required></label>
-<label>Oyuncu 2 *<input name="player2" placeholder="Ad Soyad" required></label>
-<label>Oyuncu 3 *<input name="player3" placeholder="Ad Soyad" required></label>
-<label>Oyuncu 4 *<input name="player4" placeholder="Ad Soyad" required></label>
-<label>Oyuncu 5 *<input name="player5" placeholder="Ad Soyad" required></label>
-<label>Yedek oyuncu *<input name="substitute" placeholder="Ad Soyad" required></label>
-<label class="full">Yöneticiye not (isteğe bağlı)<textarea name="note" rows="3" placeholder="Varsa notun..."></textarea></label>
-</div>
-<div class="form-foot"><p>Başvuru önce incelemeye alınır. Onaylanan takımlar turnuva sayfasında görünür.</p><button class="btn primary" type="submit">Başvuruyu gönder <span>↗</span></button></div>
+<label>Sınıf / takım adı *<input name="class_name" required maxlength="80" placeholder="Örn. 10/A"></label>
+<label>Kaptan adı *<input name="captain" required maxlength="100"></label>
+<label>İletişim bilgisi *<input name="contact" required maxlength="120" placeholder="Discord kullanıcı adı"></label>
+<label>Yedek oyuncu *<input name="substitute" required maxlength="100"></label>
+{% for i in range(1,6) %}<label>Oyuncu {{ i }} *<input name="player{{ i }}" required maxlength="100"></label>{% endfor %}
+<label class="full">Not (isteğe bağlı)<textarea name="note" rows="3" maxlength="500"></textarea></label>
+</div><button class="btn" type="submit">Başvuruyu gönder ↗</button>
 </form>
 {% endblock %}

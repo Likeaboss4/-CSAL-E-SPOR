@@ -1,33 +1,41 @@
 {% extends "base.html" %}
-{% block title %}ÇCSAL E-Spor | VALORANT{% endblock %}
+{% block title %}ŞCSAL E-Spor | Turnuva{% endblock %}
 {% block content %}
 <section class="hero">
-<div class="hero-copy"><div class="eyebrow"><span class="live-dot"></span> OKUL TURNUVASI</div>
-<h1>Herkes sınıfını<br><em>temsil etsin.</em></h1>
-<p>ÇCSAL sınıflar arası VALORANT turnuvası. Takımını kur, kaptan başvurusunu gönder ve zirveye oyna.</p>
-<div class="hero-actions"><a class="btn primary" href="{{ url_for('apply') }}">Takımını kaydet <span>↗</span></a><a class="btn ghost" href="#teams">Takımları gör</a></div>
-<div class="hero-meta"><span>5 oyuncu + 1 yedek</span><span>•</span><span>Best of 3</span><span>•</span><span>Lig usulü</span></div></div>
-<div class="hero-art"><div class="ring ring1"></div><div class="ring ring2"></div><div class="crosshair">✛</div><div class="art-tag">ÇCSAL<br><b>COMPETITIVE</b></div><div class="art-bottom">PLAY AS ONE.</div></div>
+  <div class="eyebrow">ŞCSAL · VALORANT</div>
+  <h1>OYUN BAŞLASIN<span>.</span></h1>
+  <p>ŞCSAL sınıflar arası VALORANT turnuvası. Eşleşmeleri, maç saatlerini ve finale giden yolu takip et.</p>
+  <div class="hero-actions"><a class="btn" href="{{ url_for('apply') }}">Takım başvurusu <span>↗</span></a><a class="text-link" href="#bracket">Eleme ağacını gör ↓</a></div>
 </section>
-<section class="stats">
-<div><span class="stat-number">{{ teams|length }}</span><span class="stat-label">ONAYLI TAKIM</span></div>
-<div><span class="stat-number">BO3</span><span class="stat-label">MAÇ FORMATI</span></div>
-<div><span class="stat-number">5+1</span><span class="stat-label">KADRO</span></div>
-<div><span class="stat-number">3 P</span><span class="stat-label">GALİBİYET PUANI</span></div>
+<section class="section-head"><div><p class="kicker">01 / TURNUVA MERKEZİ</p><h2>Finale giden yol</h2></div><span class="pill">8 TAKIM · ELEME USULÜ</span></section>
+<section id="bracket" class="bracket-wrap">
+  <div class="bracket">
+    {% for rn, title in [(1,'İLK TUR'),(2,'YARI FİNAL'),(3,'BÜYÜK FİNAL')] %}
+    <div class="bracket-round round-{{ rn }}">
+      <h3>{{ title }}</h3>
+      {% for m in rounds[rn] %}
+      <article class="match-card">
+        <div class="match-meta"><span>MAÇ {{ rn }}.{{ m.slot_no }}</span><span>{{ m.match_date or 'TARİH BEKLENİYOR' }}{% if m.match_time %} · {{ m.match_time }}{% endif %}</span></div>
+        <div class="team-line {% if m.status == 'completed' and m.score_a is not none and m.score_a > m.score_b %}winner{% endif %}">
+          <span class="team-name">{{ m.a_name or 'Belirlenecek takım' }}</span><strong>{{ m.score_a if m.score_a is not none else '–' }}</strong>
+        </div>
+        <div class="team-line {% if m.status == 'completed' and m.score_a is not none and m.score_b > m.score_a %}winner{% endif %}">
+          <span class="team-name">{{ m.b_name or 'Belirlenecek takım' }}</span><strong>{{ m.score_b if m.score_b is not none else '–' }}</strong>
+        </div>
+        <div class="match-foot"><span class="status-dot {{ m.status }}"></span>{{ 'Tamamlandı' if m.status == 'completed' else ('Canlı / Devam ediyor' if m.status == 'live' else 'Planlandı') }}{% if m.note %}<span class="match-note">{{ m.note }}</span>{% endif %}</div>
+      </article>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
 </section>
-<section id="teams" class="section">
-<div class="section-head"><div><div class="eyebrow">SAHNEDEKİLER</div><h2>Takımlar</h2></div><a class="text-link" href="{{ url_for('apply') }}">Sınıfını ekle ↗</a></div>
-{% if teams %}<div class="team-grid">{% for t in teams %}<article class="team-card"><div class="team-icon">{{ t.class_name[:2]|upper }}</div><div><h3>{{ t.class_name }}</h3><p>Kaptan: {{ t.captain }}</p></div><span class="approved">ONAYLI</span></article>{% endfor %}</div>{% else %}<div class="empty"><div class="empty-icon">⌁</div><h3>İlk takımını bekliyoruz</h3><p>Başvurular yönetici onayından sonra burada listelenir.</p><a class="btn primary" href="{{ url_for('apply') }}">İlk başvuruyu yap</a></div>{% endif %}
+{% if announcements %}
+<section class="section-head"><div><p class="kicker">02 / SON GELİŞMELER</p><h2>Duyurular</h2></div></section>
+<section class="announcement-grid">
+{% for a in announcements %}<article class="announcement"><span class="kicker">TURNUVA DUYURUSU</span><h3>{{ a.title }}</h3><p>{{ a.body }}</p><small>{{ a.created_at }}</small></article>{% endfor %}
 </section>
-<section class="section">
-<div class="section-head"><div><div class="eyebrow">LİG TABLOSU</div><h2>Güncel sıralama</h2></div><span class="muted">Galibiyet = 3 puan</span></div>
-<div class="table-wrap"><table><thead><tr><th>#</th><th>SINIF</th><th>O</th><th>G</th><th>M</th><th>HARİTA F.</th><th>HARİTA A.</th><th>AV.</th><th>PUAN</th></tr></thead><tbody>
-{% for s in standings %}<tr><td class="rank">{{ loop.index }}</td><td class="team-name">{{ s.team.class_name }}</td><td>{{ s.played }}</td><td>{{ s.wins }}</td><td>{{ s.losses }}</td><td>{{ s.maps_for }}</td><td>{{ s.maps_against }}</td><td>{{ s.maps_for-s.maps_against }}</td><td class="points">{{ s.points }}</td></tr>{% else %}<tr><td colspan="9" class="table-empty">Sıralama, onaylı takımlar ve maç sonuçları girildikçe oluşacak.</td></tr>{% endfor %}
-</tbody></table></div>
-</section>
-<section class="section">
-<div class="section-head"><div><div class="eyebrow">SONUÇLAR</div><h2>Maç merkezi</h2></div></div>
-{% if results %}<div class="results">{% for r in results %}<div class="result-card"><div class="result-team">{{ r.a_name }}</div><div class="result-score"><strong>{{ r.score_a }}</strong><span>:</span><strong>{{ r.score_b }}</strong><small>BO3</small></div><div class="result-team right">{{ r.b_name }}</div></div>{% endfor %}</div>{% else %}<div class="empty compact"><h3>Henüz sonuç yok</h3><p>Yönetici maç sonuçlarını girdikçe burada görünecek.</p></div>{% endif %}
-</section>
-<section class="rules"><div><div class="eyebrow">TURNUVA KURALLARI</div><h2>Rekabet adil olsun.</h2></div><div class="rule-list"><p><b>01</b> Her sınıf için 5 as oyuncu ve 1 yedek.</p><p><b>02</b> Lig usulü: takımlar fikstüre göre maç yapar.</p><p><b>03</b> Maçlar BO3; ilk 2 haritayı kazanan takım maçı alır.</p><p><b>04</b> Takımlar, kaptan başvurusu ve yönetici onayıyla listeye eklenir.</p></div></section>
+{% endif %}
+<section class="section-head"><div><p class="kicker">03 / KATILIMCILAR</p><h2>Takımlar</h2></div><span class="pill">{{ teams|length }} ONAYLI TAKIM</span></section>
+{% if teams %}<div class="team-grid">{% for t in teams %}<article class="team-tile"><span class="team-index">{{ "%02d"|format(loop.index) }}</span><h3>{{ t.class_name }}</h3><p>Kaptan: {{ t.captain }}</p></article>{% endfor %}</div>{% else %}<div class="empty-state">Henüz onaylanmış takım yok. İlk takımını başvuruyla kaydet.</div>{% endif %}
+<section class="rules"><p class="kicker">OYUN KURALLARI</p><h2>Her maç BO3.</h2><p>Maçlar üç harita üzerinden oynanır. İki harita kazanan takım tur atlar. Eşleşme ve saat duyuruları bu sayfadan paylaşılır.</p></section>
 {% endblock %}
