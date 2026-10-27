@@ -1,30 +1,43 @@
 {% extends "base.html" %}
-{% block title %}Takım Başvurusu | ŞCSAL E-Spor{% endif %}
-{% endblock %}
+{% block title %}Takım Başvurusu | ŞCSAL E-Spor{% endblock %}
 {% block content %}
 <section class="page-intro"><p class="kicker">TAKIM KAYDI</p><h1>Turnuvaya katıl<span>.</span></h1><p>Formu takım kaptanı doldursun. Başvurun yönetici onayından sonra değerlendirilir.</p></section>
-{% if not applications_open %}<div class="empty-state"><h2>Başvurular kapalı</h2><p>Yeni takım başvuruları şu anda kabul edilmiyor.</p></div>{% else %}<form class="form-panel" method="post">
+{% if not applications_open %}
+<div class="empty-state"><h2>Başvurular kapalı</h2><p>Yeni takım başvuruları şu anda kabul edilmiyor.</p></div>
+{% else %}
+<form class="form-panel" method="post">
 <div class="form-grid">
 <label>Sınıf / takım adı *<input name="class_name" required maxlength="80" placeholder="Örn. 10/A"></label>
 <label>Kaptanın adı ve soyadı *<input name="captain" required maxlength="100"></label>
 <label>Kaptanın telefon numarası *<input name="contact" type="tel" required maxlength="30" placeholder="05XX XXX XX XX" autocomplete="tel"></label>
-<label>Yedek oyuncu adı ve soyadı *<input name="substitute" required maxlength="100"></label>
-{% for i in range(1,6) %}
-<label>Oyuncu {{ i }} adı ve soyadı *<input name="player{{ i }}" required maxlength="100"></label>
-{% endfor %}
 </div>
-<section class="rank-section"><h2>Oyuncuların Peak Rank'ları</h2><p class="muted">Her oyuncunun ulaştığı en yüksek rankı seç. Bu bilgiler yalnızca yönetici panelinde görünür.</p>
+<section class="rank-section"><h2>Oyuncu kadrosu ve Peak Rank</h2><p class="muted">Her oyuncunun ulaştığı en yüksek rütbeyi seç. Telefon ve Peak Rank bilgileri yalnızca yönetici panelinde görünür.</p>
 {% set ranks = [('Iron','Iron'),('Bronze','Bronze'),('Silver','Silver'),('Gold','Gold'),('Platinum','Platinum'),('Diamond','Diamond'),('Ascendant','Ascendant'),('Immortal','Immortal'),('Radiant','Radiant')] %}
 {% for i in range(1,6) %}
-<fieldset class="rank-picker"><legend>Oyuncu {{ i }}{% if i == 1 %} · Kaptan{% endif %}</legend><div class="rank-options">
-{% for value,label in ranks %}<label class="rank-option"><input type="radio" name="rank{{ i }}" value="{{ value }}" {% if value == 'Unranked' %}checked{% endif %}><span class="rank-choice"><img src="{{ url_for('static', filename='ranks/' ~ value|lower ~ '.svg') }}" alt=""><strong>{{ label }}</strong></span></label>{% endfor %}
-</div></fieldset>
+<div class="player-rank-row">
+<label>Oyuncu {{ i }} adı ve soyadı *<input name="player{{ i }}" required maxlength="100"></label>
+<label>Peak Rank<select name="rank{{ i }}" required onchange="updateRankIcon(this)">{% for value,label in ranks %}<option value="{{ value }}" {% if value == 'Iron' %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+<img class="rank-preview" src="{{ url_for('static', filename='ranks/iron.svg') }}" alt="Iron rank">
+</div>
 {% endfor %}
-<fieldset class="rank-picker"><legend>Yedek oyuncu</legend><div class="rank-options">
-{% for value,label in ranks %}<label class="rank-option"><input type="radio" name="substitute_rank" value="{{ value }}" {% if value == 'Unranked' %}checked{% endif %}><span class="rank-choice"><img src="{{ url_for('static', filename='ranks/' ~ value|lower ~ '.svg') }}" alt=""><strong>{{ label }}</strong></span></label>{% endfor %}
-</div></fieldset>
+<div class="player-rank-row substitute-row">
+<label>Yedek oyuncu adı ve soyadı *<input name="substitute" required maxlength="100"></label>
+<label>Yedek Peak Rank<select name="substitute_rank" required onchange="updateRankIcon(this)">{% for value,label in ranks %}<option value="{{ value }}" {% if value == 'Iron' %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+<img class="rank-preview" src="{{ url_for('static', filename='ranks/iron.svg') }}" alt="Iron rank">
+</div>
 </section>
 <label class="full">Not (isteğe bağlı)<textarea name="note" rows="3" maxlength="500"></textarea></label>
 <button class="btn" type="submit">Başvuruyu gönder ↗</button>
 </form>
+<script>
+function updateRankIcon(select) {
+  const row = select.closest('.player-rank-row');
+  const img = row && row.querySelector('.rank-preview');
+  if (img) {
+    img.src = "{{ url_for('static', filename='ranks/') }}" + select.value.toLowerCase() + ".svg";
+    img.alt = select.value + " rank";
+  }
+}
+</script>
+{% endif %}
 {% endblock %}
