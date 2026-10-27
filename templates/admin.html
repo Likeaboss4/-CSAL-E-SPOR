@@ -6,6 +6,32 @@
 <section class="admin-section"><h2>Bekleyen başvurular</h2>
 {% if pending %}{% for t in pending %}<article class="admin-card"><div><h3>{{ t.class_name }} · {{ t.captain }}</h3><p>{{ t.contact }} · Oyuncular: {{ t.player1 }}, {{ t.player2 }}, {{ t.player3 }}, {{ t.player4 }}, {{ t.player5 }} · Yedek: {{ t.substitute }}</p></div><div class="inline-actions"><form method="post"><input type="hidden" name="action" value="approve"><input type="hidden" name="team_id" value="{{ t.id }}"><button class="btn" type="submit">Onayla</button></form><form method="post"><input type="hidden" name="action" value="reject"><input type="hidden" name="team_id" value="{{ t.id }}"><button class="btn btn-danger" type="submit">Reddet</button></form></div></article>{% endfor %}{% else %}<p class="muted">Bekleyen başvuru yok.</p>{% endif %}
 </section>
+<section class="admin-section"><h2>Takımları ve oyuncuları düzenle</h2>
+<p class="muted">Oyuncu isimlerini, kaptanı, sınıfı ve diğer bilgileri değiştirebilir veya takımı silebilirsin. Takım silinince o takıma bağlı maç eşleşmeleri ve skorları sıfırlanır.</p>
+{% if all_teams %}
+{% for t in all_teams %}
+<details class="admin-card team-edit-card"><summary><strong>{{ t.class_name }}</strong> · {{ t.captain }} <span class="pill">{{ {'pending':'Bekliyor','approved':'Onaylı','rejected':'Reddedildi'}.get(t.status, t.status) }}</span></summary>
+<form class="number-form" method="post"><input type="hidden" name="action" value="assign_number"><input type="hidden" name="team_id" value="{{ t.id }}"><label>Herkese açık takım numarası<select name="team_number"><option value="">Atanmadı</option>{% for n in range(1,9) %}<option value="{{ n }}" {% if t.team_number == n %}selected{% endif %}>Takım {{ n }}</option>{% endfor %}</select></label><button class="btn" type="submit">Numarayı kaydet</button></form>
+<form class="form-panel team-edit-form" method="post">
+<input type="hidden" name="action" value="edit_team"><input type="hidden" name="team_id" value="{{ t.id }}">
+<div class="form-grid">
+<label>Takım adı / sınıf<input name="class_name" required value="{{ t.class_name }}"></label>
+<label>Kaptan<input name="captain" required value="{{ t.captain }}"></label>
+<label>İletişim<input name="contact" required value="{{ t.contact }}"></label>
+<label>Oyuncu 1<input name="player1" required value="{{ t.player1 }}"></label>
+<label>Oyuncu 2<input name="player2" required value="{{ t.player2 }}"></label>
+<label>Oyuncu 3<input name="player3" required value="{{ t.player3 }}"></label>
+<label>Oyuncu 4<input name="player4" required value="{{ t.player4 }}"></label>
+<label>Oyuncu 5<input name="player5" required value="{{ t.player5 }}"></label>
+<label>Yedek oyuncu<input name="substitute" required value="{{ t.substitute }}"></label>
+<label class="full-field">Not<textarea name="note" rows="2">{{ t.note or '' }}</textarea></label>
+</div><button class="btn" type="submit">Değişiklikleri kaydet</button>
+</form>
+<form method="post" class="delete-team-form" onsubmit="return confirm('Bu takımı silmek istediğine emin misin? Takıma bağlı maç eşleşmeleri ve skorları sıfırlanacak.');"><input type="hidden" name="action" value="delete_team"><input type="hidden" name="team_id" value="{{ t.id }}"><button class="btn btn-danger" type="submit">Takımı tamamen sil</button></form>
+</details>
+{% endfor %}
+{% else %}<p class="muted">Henüz takım kaydı yok.</p>{% endif %}
+</section>
 <section class="admin-section"><h2>Eşleşme ve maç takvimi</h2><p class="muted">İlk tur: 4 maç · Yarı final: 2 maç · Büyük final: 1 maç. Eşleşmeleri istediğin gibi seçebilirsin.</p>
 {% for rn,title in [(1,'İlk tur'),(2,'Yarı final'),(3,'Büyük final')] %}
 <div class="admin-round-block"><h3>{{ title }}</h3>
@@ -13,8 +39,8 @@
 <form class="match-editor" method="post">
 <input type="hidden" name="action" value="save_match"><input type="hidden" name="round_no" value="{{ rn }}"><input type="hidden" name="slot_no" value="{{ m.slot_no }}">
 <div class="editor-label">Maç {{ rn }}.{{ m.slot_no }}</div>
-<label>Takım A<select name="team_a"><option value="">Belirlenecek</option>{% for t in teams %}<option value="{{ t.id }}" {% if m.team_a|string == t.id|string %}selected{% endif %}>{{ t.class_name }}</option>{% endfor %}</select></label>
-<label>Takım B<select name="team_b"><option value="">Belirlenecek</option>{% for t in teams %}<option value="{{ t.id }}" {% if m.team_b|string == t.id|string %}selected{% endif %}>{{ t.class_name }}</option>{% endfor %}</select></label>
+<label>Takım A<select name="team_a"><option value="">Belirlenecek</option>{% for t in teams %}<option value="{{ t.id }}" {% if m.team_a|string == t.id|string %}selected{% endif %}>{{ ("Takım " ~ t.team_number ~ " · ") if t.team_number else "Numarasız · " }}{{ t.class_name }}</option>{% endfor %}</select></label>
+<label>Takım B<select name="team_b"><option value="">Belirlenecek</option>{% for t in teams %}<option value="{{ t.id }}" {% if m.team_b|string == t.id|string %}selected{% endif %}>{{ ("Takım " ~ t.team_number ~ " · ") if t.team_number else "Numarasız · " }}{{ t.class_name }}</option>{% endfor %}</select></label>
 <label>Tarih<input type="date" name="match_date" value="{{ m.match_date or '' }}"></label>
 <label>Saat<input type="time" name="match_time" value="{{ m.match_time or '' }}"></label>
 <label>Durum<select name="status"><option value="upcoming" {% if m.status=='upcoming' %}selected{% endif %}>Planlandı</option><option value="live" {% if m.status=='live' %}selected{% endif %}>Canlı / devam ediyor</option><option value="completed" {% if m.status=='completed' %}selected{% endif %}>Tamamlandı</option></select></label>

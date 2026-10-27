@@ -36,6 +36,6 @@
 </section>
 {% endif %}
 <section class="section-head"><div><p class="kicker">03 / KATILIMCILAR</p><h2>Takımlar</h2></div><span class="pill">{{ teams|length }} ONAYLI TAKIM</span></section>
-{% if teams %}<div class="team-grid">{% for t in teams %}<article class="team-tile"><span class="team-index">{{ "%02d"|format(loop.index) }}</span><h3>{{ t.class_name }}</h3><p>Kaptan: {{ t.captain }}</p></article>{% endfor %}</div>{% else %}<div class="empty-state">Henüz onaylanmış takım yok. İlk takımını başvuruyla kaydet.</div>{% endif %}
+{% if teams %}<div class="team-grid">{% for t in teams %}<article class="team-tile"><span class="team-index">{{ "%02d"|format(loop.index) }}</span><h3>{{ ("Takım " ~ t.team_number) if t.team_number else "Numara bekleniyor" }}</h3><p>Turnuva katılımcısı</p></article>{% endfor %}</div>{% else %}<div class="empty-state">Henüz onaylanmış takım yok. İlk takımını başvuruyla kaydet.</div>{% endif %}
 <section class="rules"><p class="kicker">OYUN KURALLARI</p><h2>Her maç BO3.</h2><p>Maçlar üç harita üzerinden oynanır. İki harita kazanan takım tur atlar. Eşleşme ve saat duyuruları bu sayfadan paylaşılır.</p></section>
 {% endblock %}
