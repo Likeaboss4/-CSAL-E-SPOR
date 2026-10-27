@@ -22,7 +22,7 @@ class Database:
                 url = "postgresql://" + url[len("postgres://"):]
             if "sslmode=" not in url:
                 url += ("&" if "?" in url else "?") + "sslmode=require"
-            self.conn = psycopg.connect(url, row_factory=dict_row)
+            self.conn = psycopg.connect(url, row_factory=dict_row, prepare_threshold=None)
         else:
             self.conn = sqlite3.connect(DB_PATH)
             self.conn.row_factory = sqlite3.Row
