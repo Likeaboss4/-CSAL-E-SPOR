@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<header class="topbar"><a class="brand" href="{{ url_for('index') }}"><span class="brand-mark">Ş</span><span>ŞCSAL <b>E-SPOR</b></span></a>
+<header class="topbar"><a class="brand" href="{{ url_for('index') }}"><img class="brand-logo" src="{{ url_for('static', filename='scsal-valorant-logo.jpg') }}" alt="ŞCSAL Valorant Turnuvası"><span>ŞCSAL <b>E-SPOR</b></span></a>
 <nav><a href="{{ url_for('index') }}">Turnuva</a><a href="{{ url_for('apply') }}">Takım Başvurusu</a><a href="{{ url_for('admin') }}">Yönetim</a><a href="{{ url_for('rules') }}">Kurallar</a></nav></header>
 <main class="container">
 {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}<div class="notice {{ category }}">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}
