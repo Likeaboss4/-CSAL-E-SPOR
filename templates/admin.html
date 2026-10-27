@@ -2,7 +2,7 @@
 {% block title %}Yönetim | ŞCSAL E-Spor{% endblock %}
 {% block content %}
 <section class="page-intro"><p class="kicker">YÖNETİM PANELİ</p><h1>Turnuvayı yönet<span>.</span></h1><p>Eşleşmeleri, maç skorlarını, başvuruları ve duyuruları buradan düzenle.</p></section>
-<div class="admin-top"><span class="pill">{{ pending|length }} BEKLEYEN BAŞVURU</span><form method="post" action="{{ url_for('admin_logout') }}"><button class="btn btn-quiet" type="submit">Çıkış yap</button></form></div>
+<div class="admin-top"><span class="pill">{{ pending|length }} BEKLEYEN BAŞVURU · BAŞVURULAR {{ "AÇIK" if applications_open else "KAPALI" }}</span><form method="post"><input type="hidden" name="action" value="applications_toggle"><button class="btn {{ "btn-danger" if applications_open else "" }}" type="submit">Başvuruları {{ "kapat" if applications_open else "aç" }}</button></form><form method="post" action="{{ url_for('admin_logout') }}"><button class="btn btn-quiet" type="submit">Çıkış yap</button></form></div>
 <section class="admin-section"><h2>Bekleyen başvurular</h2>
 {% if pending %}{% for t in pending %}<article class="admin-card"><div><h3>{{ t.class_name }} · {{ t.captain }}</h3><p><strong>Kaptan telefonu:</strong> {{ t.contact }}<br>Oyuncular: {{ t.player1 }} ({{ t.rank1 }}), {{ t.player2 }} ({{ t.rank2 }}), {{ t.player3 }} ({{ t.rank3 }}), {{ t.player4 }} ({{ t.rank4 }}), {{ t.player5 }} ({{ t.rank5 }}) · Yedek: {{ t.substitute }} ({{ t.substitute_rank }})</p></div><div class="inline-actions"><form method="post"><input type="hidden" name="action" value="approve"><input type="hidden" name="team_id" value="{{ t.id }}"><button class="btn" type="submit">Onayla</button></form><form method="post"><input type="hidden" name="action" value="reject"><input type="hidden" name="team_id" value="{{ t.id }}"><button class="btn btn-danger" type="submit">Reddet</button></form></div></article>{% endfor %}{% else %}<p class="muted">Bekleyen başvuru yok.</p>{% endif %}
 </section>
@@ -11,6 +11,7 @@
 {% if all_teams %}
 {% for t in all_teams %}
 <details class="admin-card team-edit-card"><summary><strong>{{ t.class_name }}</strong> · {{ t.captain }} <span class="pill">{{ {'pending':'Bekliyor','approved':'Onaylı','rejected':'Reddedildi'}.get(t.status, t.status) }}</span></summary>
+<form class="color-form" method="post"><input type="hidden" name="action" value="set_color"><input type="hidden" name="team_id" value="{{ t.id }}"><label>Takım rengi<select name="team_color">{% for key,hex in team_colors.items() %}<option value="{{ key }}" {% if t.team_color == hex %}selected{% endif %}>{{ key }} · {{ hex }}</option>{% endfor %}</select></label><button class="btn" type="submit">Rengi kaydet</button></form>
 <form class="number-form" method="post"><input type="hidden" name="action" value="assign_number"><input type="hidden" name="team_id" value="{{ t.id }}"><label>Herkese açık takım numarası<select name="team_number"><option value="">Atanmadı</option>{% for n in range(1,9) %}<option value="{{ n }}" {% if t.team_number == n %}selected{% endif %}>Takım {{ n }}</option>{% endfor %}</select></label><button class="btn" type="submit">Numarayı kaydet</button></form>
 <form class="form-panel team-edit-form" method="post">
 <input type="hidden" name="action" value="edit_team"><input type="hidden" name="team_id" value="{{ t.id }}">
@@ -24,7 +25,7 @@
 <label>Oyuncu 4<input name="player4" required value="{{ t.player4 }}"></label>
 <label>Oyuncu 5<input name="player5" required value="{{ t.player5 }}"></label>
 <label>Yedek oyuncu<input name="substitute" required value="{{ t.substitute }}"></label>
-{% set ranks = [('Iron','Iron'),('Bronze','Bronze'),('Silver','Silver'),('Gold','Gold'),('Platinum','Platinum'),('Diamond','Diamond'),('Ascendant','Ascendant'),('Immortal','Immortal'),('Radiant','Radiant'),('Unranked','Rankı yok')] %}
+{% set ranks = [('Iron','Iron'),('Bronze','Bronze'),('Silver','Silver'),('Gold','Gold'),('Platinum','Platinum'),('Diamond','Diamond'),('Ascendant','Ascendant'),('Immortal','Immortal'),('Radiant','Radiant')] %}
 {% for i in range(1,6) %}<label>Oyuncu {{ i }} Peak Rank<select name="rank{{ i }}">{% for value,label in ranks %}<option value="{{ value }}" {% if t['rank' ~ i] == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>{% endfor %}
 <label>Yedek Peak Rank<select name="substitute_rank">{% for value,label in ranks %}<option value="{{ value }}" {% if t.substitute_rank == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
 <label class="full-field">Not<textarea name="note" rows="2">{{ t.note or '' }}</textarea></label>
