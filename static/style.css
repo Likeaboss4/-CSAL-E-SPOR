@@ -11,3 +11,20 @@
 .full-field { grid-column: 1 / -1; }
 .delete-team-form { margin-top: 12px; }
 @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } .full-field { grid-column: auto; } }
+
+
+/* Private Peak Rank selection */
+.rank-section { margin: 1.5rem 0; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,.12); }
+.rank-section h2 { margin-bottom: .4rem; }
+.rank-picker { border: 1px solid rgba(255,255,255,.13); border-radius: 14px; padding: 1rem; margin: 1rem 0; min-width: 0; }
+.rank-picker legend { padding: 0 .45rem; font-weight: 700; }
+.rank-options { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: .65rem; }
+.rank-option { display: block; cursor: pointer; }
+.rank-option input { position: absolute; opacity: 0; pointer-events: none; }
+.rank-choice { display: flex; flex-direction: column; align-items: center; gap: .45rem; padding: .7rem .35rem; border: 1px solid rgba(255,255,255,.13); border-radius: 10px; background: rgba(255,255,255,.025); text-align: center; transition: border-color .15s, background .15s; min-height: 105px; }
+.rank-choice img { width: 48px; height: 48px; object-fit: contain; }
+.rank-choice strong { font-size: .78rem; }
+.rank-option input:checked + .rank-choice { border: 2px solid #50f59a; background: rgba(80,245,154,.1); box-shadow: 0 0 0 1px rgba(80,245,154,.1); }
+.rank-option:focus-within .rank-choice { outline: 2px solid #50f59a; outline-offset: 2px; }
+@media (max-width: 700px) { .rank-options { grid-template-columns: repeat(3,minmax(0,1fr)); } .rank-choice { min-height: 95px; } }
+@media (max-width: 400px) { .rank-options { grid-template-columns: repeat(2,minmax(0,1fr)); } }
