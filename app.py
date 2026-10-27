@@ -357,6 +357,13 @@ def admin():
                         raise ValueError()
                     con.execute("INSERT INTO announcements(title,body) VALUES(?,?)", (title,body))
                     flash("Duyuru yayımlandı.", "success")
+                elif action == "edit_announcement":
+                    aid = int(request.form["announcement_id"])
+                    title, body = request.form.get("title", "").strip(), request.form.get("body", "").strip()
+                    if not title or not body:
+                        raise ValueError("Duyuru başlığı ve metni boş olamaz.")
+                    con.execute("UPDATE announcements SET title=?, body=? WHERE id=?", (title, body, aid))
+                    flash("Duyuru güncellendi.", "success")
                 elif action == "delete_announcement":
                     con.execute("DELETE FROM announcements WHERE id=?", (request.form.get("announcement_id"),))
                 else:
