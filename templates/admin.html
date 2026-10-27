@@ -4,10 +4,10 @@
 <section class="page-intro"><p class="kicker">YÖNETİM PANELİ</p><h1>Turnuvayı yönet<span>.</span></h1><p>Eşleşmeleri, maç skorlarını, başvuruları ve duyuruları buradan düzenle.</p></section>
 <div class="admin-top"><span class="pill">{{ pending|length }} BEKLEYEN BAŞVURU</span><form method="post" action="{{ url_for('admin_logout') }}"><button class="btn btn-quiet" type="submit">Çıkış yap</button></form></div>
 <section class="admin-section"><h2>Bekleyen başvurular</h2>
-{% if pending %}{% for t in pending %}<article class="admin-card"><div><h3>{{ t.class_name }} · {{ t.captain }}</h3><p>{{ t.contact }} · Oyuncular: {{ t.player1 }}, {{ t.player2 }}, {{ t.player3 }}, {{ t.player4 }}, {{ t.player5 }} · Yedek: {{ t.substitute }}</p></div><div class="inline-actions"><form method="post"><input type="hidden" name="action" value="approve"><input type="hidden" name="team_id" value="{{ t.id }}"><button class="btn" type="submit">Onayla</button></form><form method="post"><input type="hidden" name="action" value="reject"><input type="hidden" name="team_id" value="{{ t.id }}"><button class="btn btn-danger" type="submit">Reddet</button></form></div></article>{% endfor %}{% else %}<p class="muted">Bekleyen başvuru yok.</p>{% endif %}
+{% if pending %}{% for t in pending %}<article class="admin-card"><div><h3>{{ t.class_name }} · {{ t.captain }}</h3><p><strong>Kaptan telefonu:</strong> {{ t.contact }}<br>Oyuncular: {{ t.player1 }} ({{ t.rank1 }}), {{ t.player2 }} ({{ t.rank2 }}), {{ t.player3 }} ({{ t.rank3 }}), {{ t.player4 }} ({{ t.rank4 }}), {{ t.player5 }} ({{ t.rank5 }}) · Yedek: {{ t.substitute }} ({{ t.substitute_rank }})</p></div><div class="inline-actions"><form method="post"><input type="hidden" name="action" value="approve"><input type="hidden" name="team_id" value="{{ t.id }}"><button class="btn" type="submit">Onayla</button></form><form method="post"><input type="hidden" name="action" value="reject"><input type="hidden" name="team_id" value="{{ t.id }}"><button class="btn btn-danger" type="submit">Reddet</button></form></div></article>{% endfor %}{% else %}<p class="muted">Bekleyen başvuru yok.</p>{% endif %}
 </section>
 <section class="admin-section"><h2>Takımları ve oyuncuları düzenle</h2>
-<p class="muted">Oyuncu isimlerini, kaptanı, sınıfı ve diğer bilgileri değiştirebilir veya takımı silebilirsin. Takım silinince o takıma bağlı maç eşleşmeleri ve skorları sıfırlanır.</p>
+<p class="muted">Oyuncu isimlerini, kaptanı, sınıfı ve diğer bilgileri değiştirebilir veya takımı silebilirsin. Takım silinince başvuru ve oyuncu bilgileri, bağlı maç sonuçları ve fikstür eşleşmeleri temizlenir. Silme işlemi geri alınamaz.</p>
 {% if all_teams %}
 {% for t in all_teams %}
 <details class="admin-card team-edit-card"><summary><strong>{{ t.class_name }}</strong> · {{ t.captain }} <span class="pill">{{ {'pending':'Bekliyor','approved':'Onaylı','rejected':'Reddedildi'}.get(t.status, t.status) }}</span></summary>
@@ -17,17 +17,20 @@
 <div class="form-grid">
 <label>Takım adı / sınıf<input name="class_name" required value="{{ t.class_name }}"></label>
 <label>Kaptan<input name="captain" required value="{{ t.captain }}"></label>
-<label>İletişim<input name="contact" required value="{{ t.contact }}"></label>
+<label>Kaptanın telefon numarası<input name="contact" type="tel" required value="{{ t.contact }}"></label>
 <label>Oyuncu 1<input name="player1" required value="{{ t.player1 }}"></label>
 <label>Oyuncu 2<input name="player2" required value="{{ t.player2 }}"></label>
 <label>Oyuncu 3<input name="player3" required value="{{ t.player3 }}"></label>
 <label>Oyuncu 4<input name="player4" required value="{{ t.player4 }}"></label>
 <label>Oyuncu 5<input name="player5" required value="{{ t.player5 }}"></label>
 <label>Yedek oyuncu<input name="substitute" required value="{{ t.substitute }}"></label>
+{% set ranks = [('Iron','Iron'),('Bronze','Bronze'),('Silver','Silver'),('Gold','Gold'),('Platinum','Platinum'),('Diamond','Diamond'),('Ascendant','Ascendant'),('Immortal','Immortal'),('Radiant','Radiant'),('Unranked','Rankı yok')] %}
+{% for i in range(1,6) %}<label>Oyuncu {{ i }} Peak Rank<select name="rank{{ i }}">{% for value,label in ranks %}<option value="{{ value }}" {% if t['rank' ~ i] == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>{% endfor %}
+<label>Yedek Peak Rank<select name="substitute_rank">{% for value,label in ranks %}<option value="{{ value }}" {% if t.substitute_rank == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
 <label class="full-field">Not<textarea name="note" rows="2">{{ t.note or '' }}</textarea></label>
 </div><button class="btn" type="submit">Değişiklikleri kaydet</button>
 </form>
-<form method="post" class="delete-team-form" onsubmit="return confirm('Bu takımı silmek istediğine emin misin? Takıma bağlı maç eşleşmeleri ve skorları sıfırlanacak.');"><input type="hidden" name="action" value="delete_team"><input type="hidden" name="team_id" value="{{ t.id }}"><button class="btn btn-danger" type="submit">Takımı tamamen sil</button></form>
+<form method="post" class="delete-team-form" onsubmit="return confirm('Bu takımı, başvurusunu, oyuncu bilgilerini ve ilişkili tüm maç sonuçlarını silmek istediğine emin misin? Bu işlem geri alınamaz.');"><input type="hidden" name="action" value="delete_team"><input type="hidden" name="team_id" value="{{ t.id }}"><button class="btn btn-danger" type="submit">Takımı tamamen sil</button></form>
 </details>
 {% endfor %}
 {% else %}<p class="muted">Henüz takım kaydı yok.</p>{% endif %}

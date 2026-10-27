@@ -1,15 +1,29 @@
 {% extends "base.html" %}
 {% block title %}Takım Başvurusu | ŞCSAL E-Spor{% endblock %}
 {% block content %}
-<section class="page-intro"><p class="kicker">TAKIM KAYDI</p><h1>Turnuvaya katıl<span>.</span></h1><p>Formu takım kaptanı doldursun. Başvurun yönetici onayından sonra yayımlanır.</p></section>
+<section class="page-intro"><p class="kicker">TAKIM KAYDI</p><h1>Turnuvaya katıl<span>.</span></h1><p>Formu takım kaptanı doldursun. Başvurun yönetici onayından sonra değerlendirilir.</p></section>
 <form class="form-panel" method="post">
 <div class="form-grid">
 <label>Sınıf / takım adı *<input name="class_name" required maxlength="80" placeholder="Örn. 10/A"></label>
-<label>Kaptan adı *<input name="captain" required maxlength="100"></label>
-<label>İletişim bilgisi *<input name="contact" required maxlength="120" placeholder="Discord kullanıcı adı"></label>
-<label>Yedek oyuncu *<input name="substitute" required maxlength="100"></label>
-{% for i in range(1,6) %}<label>Oyuncu {{ i }} *<input name="player{{ i }}" required maxlength="100"></label>{% endfor %}
+<label>Kaptanın adı ve soyadı *<input name="captain" required maxlength="100"></label>
+<label>Kaptanın telefon numarası *<input name="contact" type="tel" required maxlength="30" placeholder="05XX XXX XX XX" autocomplete="tel"></label>
+<label>Yedek oyuncu adı ve soyadı *<input name="substitute" required maxlength="100"></label>
+{% for i in range(1,6) %}
+<label>Oyuncu {{ i }} adı ve soyadı *<input name="player{{ i }}" required maxlength="100"></label>
+{% endfor %}
+</div>
+<section class="rank-section"><h2>Oyuncuların Peak Rank'ları</h2><p class="muted">Her oyuncunun ulaştığı en yüksek rankı seç. Bu bilgiler yalnızca yönetici panelinde görünür.</p>
+{% set ranks = [('Iron','Iron'),('Bronze','Bronze'),('Silver','Silver'),('Gold','Gold'),('Platinum','Platinum'),('Diamond','Diamond'),('Ascendant','Ascendant'),('Immortal','Immortal'),('Radiant','Radiant'),('Unranked','Rankı yok')] %}
+{% for i in range(1,6) %}
+<fieldset class="rank-picker"><legend>Oyuncu {{ i }}{% if i == 1 %} · Kaptan{% endif %}</legend><div class="rank-options">
+{% for value,label in ranks %}<label class="rank-option"><input type="radio" name="rank{{ i }}" value="{{ value }}" {% if value == 'Unranked' %}checked{% endif %}><span class="rank-choice"><img src="{{ url_for('static', filename='ranks/' ~ value|lower ~ '.svg') }}" alt=""><strong>{{ label }}</strong></span></label>{% endfor %}
+</div></fieldset>
+{% endfor %}
+<fieldset class="rank-picker"><legend>Yedek oyuncu</legend><div class="rank-options">
+{% for value,label in ranks %}<label class="rank-option"><input type="radio" name="substitute_rank" value="{{ value }}" {% if value == 'Unranked' %}checked{% endif %}><span class="rank-choice"><img src="{{ url_for('static', filename='ranks/' ~ value|lower ~ '.svg') }}" alt=""><strong>{{ label }}</strong></span></label>{% endfor %}
+</div></fieldset>
+</section>
 <label class="full">Not (isteğe bağlı)<textarea name="note" rows="3" maxlength="500"></textarea></label>
-</div><button class="btn" type="submit">Başvuruyu gönder ↗</button>
+<button class="btn" type="submit">Başvuruyu gönder ↗</button>
 </form>
 {% endblock %}
