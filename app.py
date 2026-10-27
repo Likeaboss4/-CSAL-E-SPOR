@@ -207,11 +207,11 @@ def apply():
         rank_values = [request.form.get(k, "").strip() for k in ("rank1", "rank2", "rank3", "rank4", "rank5", "substitute_rank")]
         if any(rank not in rank_options for rank in rank_values):
             flash("Lütfen her oyuncu için geçerli bir Peak Rank seçin.", "error")
-            return render_template("apply.html")
+            return render_template("apply.html", applications_open=True)
         note = request.form.get("note", "").strip()
         if any(not v for v in values):
             flash("Lütfen zorunlu alanların tamamını doldurun.", "error")
-            return render_template("apply.html")
+            return render_template("apply.html", applications_open=True)
         try:
             with db() as con:
                 con.execute("""INSERT INTO teams
@@ -225,7 +225,7 @@ def apply():
             else:
                 app.logger.exception("Başvuru kaydedilemedi")
                 flash("Başvuru kaydedilemedi. Lütfen daha sonra tekrar deneyin.", "error")
-    return render_template("apply.html")
+    return render_template("apply.html", applications_open=True)
 
 def admin_authorized():
     if session.get("admin_logged_in"):
