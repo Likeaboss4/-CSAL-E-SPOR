@@ -52,6 +52,8 @@ def init_db():
                 class_name TEXT NOT NULL UNIQUE, team_number INTEGER UNIQUE, captain TEXT NOT NULL, contact TEXT NOT NULL,
                 player1 TEXT NOT NULL, player2 TEXT NOT NULL, player3 TEXT NOT NULL,
                 player4 TEXT NOT NULL, player5 TEXT NOT NULL, substitute TEXT NOT NULL,
+                rank1 TEXT NOT NULL DEFAULT 'Unranked', rank2 TEXT NOT NULL DEFAULT 'Unranked', rank3 TEXT NOT NULL DEFAULT 'Unranked',
+                rank4 TEXT NOT NULL DEFAULT 'Unranked', rank5 TEXT NOT NULL DEFAULT 'Unranked', substitute_rank TEXT NOT NULL DEFAULT 'Unranked',
                 note TEXT DEFAULT '', status TEXT NOT NULL DEFAULT 'pending',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""")
             con.execute("""CREATE TABLE IF NOT EXISTS results (
@@ -65,7 +67,9 @@ def init_db():
                 id INTEGER PRIMARY KEY AUTOINCREMENT, class_name TEXT NOT NULL UNIQUE, team_number INTEGER UNIQUE,
                 captain TEXT NOT NULL, contact TEXT NOT NULL, player1 TEXT NOT NULL,
                 player2 TEXT NOT NULL, player3 TEXT NOT NULL, player4 TEXT NOT NULL,
-                player5 TEXT NOT NULL, substitute TEXT NOT NULL, note TEXT DEFAULT '',
+                player5 TEXT NOT NULL, substitute TEXT NOT NULL, rank1 TEXT NOT NULL DEFAULT 'Unranked', rank2 TEXT NOT NULL DEFAULT 'Unranked',
+                rank3 TEXT NOT NULL DEFAULT 'Unranked', rank4 TEXT NOT NULL DEFAULT 'Unranked', rank5 TEXT NOT NULL DEFAULT 'Unranked',
+                substitute_rank TEXT NOT NULL DEFAULT 'Unranked', note TEXT DEFAULT '',
                 status TEXT NOT NULL DEFAULT 'pending', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""")
             con.execute("""CREATE TABLE IF NOT EXISTS results (
                 id INTEGER PRIMARY KEY AUTOINCREMENT, team_a INTEGER NOT NULL, team_b INTEGER NOT NULL,
@@ -117,8 +121,22 @@ def migrate_team_number():
                 con.execute("ALTER TABLE teams ADD COLUMN team_number INTEGER")
             con.execute("CREATE UNIQUE INDEX IF NOT EXISTS teams_team_number_unique ON teams(team_number)")
 
+def migrate_private_ranks():
+    """Adds private peak-rank fields without deleting existing applications."""
+    rank_columns = ("rank1", "rank2", "rank3", "rank4", "rank5", "substitute_rank")
+    with db() as con:
+        if con.is_postgres:
+            for col in rank_columns:
+                con.execute(f"ALTER TABLE teams ADD COLUMN IF NOT EXISTS {col} TEXT NOT NULL DEFAULT 'Unranked'")
+        else:
+            cols = [r[1] for r in con.execute("PRAGMA table_info(teams)").fetchall()]
+            for col in rank_columns:
+                if col not in cols:
+                    con.execute(f"ALTER TABLE teams ADD COLUMN {col} TEXT NOT NULL DEFAULT 'Unranked'")
+
 init_db()
 migrate_team_number()
+migrate_private_ranks()
 init_tournament_tables()
 seed_bracket()
 
@@ -149,6 +167,11 @@ def apply():
     if request.method == "POST":
         fields = ["class_name","captain","contact","player1","player2","player3","player4","player5","substitute"]
         values = [request.form.get(k, "").strip() for k in fields]
+        rank_options = {"Iron", "Bronze", "Silver", "Gold", "Platinum", "Diamond", "Ascendant", "Immortal", "Radiant", "Unranked"}
+        rank_values = [request.form.get(k, "Unranked").strip() for k in ("rank1", "rank2", "rank3", "rank4", "rank5", "substitute_rank")]
+        if any(rank not in rank_options for rank in rank_values):
+            flash("Lütfen her oyuncu için geçerli bir Peak Rank seçin.", "error")
+            return render_template("apply.html")
         note = request.form.get("note", "").strip()
         if any(not v for v in values):
             flash("Lütfen zorunlu alanların tamamını doldurun.", "error")
@@ -156,8 +179,8 @@ def apply():
         try:
             with db() as con:
                 con.execute("""INSERT INTO teams
-                    (class_name,captain,contact,player1,player2,player3,player4,player5,substitute,note)
-                    VALUES(?,?,?,?,?,?,?,?,?,?)""", values + [note])
+                    (class_name,captain,contact,player1,player2,player3,player4,player5,substitute,rank1,rank2,rank3,rank4,rank5,substitute_rank,note)
+                    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", values + rank_values + [note])
             flash("Başvurun alındı! Yönetici onayından sonra takım listesinde görünecek.", "success")
             return redirect(url_for("apply"))
         except Exception as e:
@@ -212,18 +235,21 @@ def admin():
                     tid = int(request.form["team_id"])
                     fields = ["class_name", "captain", "contact", "player1", "player2", "player3", "player4", "player5", "substitute"]
                     vals = [request.form.get(k, "").strip() for k in fields]
+                    rank_fields = ["rank1", "rank2", "rank3", "rank4", "rank5", "substitute_rank"]
+                    rank_vals = [request.form.get(k, "Unranked").strip() for k in rank_fields]
                     note = request.form.get("note", "").strip()
                     if any(not v for v in vals):
                         raise ValueError("Zorunlu alanları doldurun.")
-                    con.execute("UPDATE teams SET class_name=?,captain=?,contact=?,player1=?,player2=?,player3=?,player4=?,player5=?,substitute=?,note=? WHERE id=?", vals+[note,tid])
+                    con.execute("UPDATE teams SET class_name=?,captain=?,contact=?,player1=?,player2=?,player3=?,player4=?,player5=?,substitute=?,rank1=?,rank2=?,rank3=?,rank4=?,rank5=?,substitute_rank=?,note=? WHERE id=?", vals+rank_vals+[note,tid])
                     flash("Takım bilgileri güncellendi.", "success")
                 elif action == "delete_team":
                     tid = int(request.form["team_id"])
-                    con.execute("UPDATE matches SET team_a=NULL,score_a=NULL,status='upcoming' WHERE team_a=?", (tid,))
-                    con.execute("UPDATE matches SET team_b=NULL,score_b=NULL,status='upcoming' WHERE team_b=?", (tid,))
+                    # Remove the team's references and any match results. Keep the bracket slots themselves.
+                    con.execute("UPDATE matches SET team_a=NULL,score_a=NULL,score_b=NULL,status='upcoming' WHERE team_a=?", (tid,))
+                    con.execute("UPDATE matches SET team_b=NULL,score_a=NULL,score_b=NULL,status='upcoming' WHERE team_b=?", (tid,))
                     con.execute("DELETE FROM results WHERE team_a=? OR team_b=?", (tid,tid))
                     con.execute("DELETE FROM teams WHERE id=?", (tid,))
-                    flash("Takım silindi; ilgili eşleşmeler boşaltıldı.", "success")
+                    flash("Takım ve ilişkili tüm kayıtları silindi.", "success")
                 elif action == "assign_number":
                     tid = int(request.form["team_id"])
                     raw = request.form.get("team_number", "").strip()
