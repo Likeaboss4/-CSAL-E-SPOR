@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Takım Başvurusu | ŞCSAL E-Spor{% endblock %}
+{% block title %}Takım Başvurusu | ŞCSAL E-Spor{% endif %}
+{% endblock %}
 {% block content %}
 <section class="page-intro"><p class="kicker">TAKIM KAYDI</p><h1>Turnuvaya katıl<span>.</span></h1><p>Formu takım kaptanı doldursun. Başvurun yönetici onayından sonra değerlendirilir.</p></section>
-<form class="form-panel" method="post">
+{% if not applications_open %}<div class="empty-state"><h2>Başvurular kapalı</h2><p>Yeni takım başvuruları şu anda kabul edilmiyor.</p></div>{% else %}<form class="form-panel" method="post">
 <div class="form-grid">
 <label>Sınıf / takım adı *<input name="class_name" required maxlength="80" placeholder="Örn. 10/A"></label>
 <label>Kaptanın adı ve soyadı *<input name="captain" required maxlength="100"></label>
@@ -13,7 +14,7 @@
 {% endfor %}
 </div>
 <section class="rank-section"><h2>Oyuncuların Peak Rank'ları</h2><p class="muted">Her oyuncunun ulaştığı en yüksek rankı seç. Bu bilgiler yalnızca yönetici panelinde görünür.</p>
-{% set ranks = [('Iron','Iron'),('Bronze','Bronze'),('Silver','Silver'),('Gold','Gold'),('Platinum','Platinum'),('Diamond','Diamond'),('Ascendant','Ascendant'),('Immortal','Immortal'),('Radiant','Radiant'),('Unranked','Rankı yok')] %}
+{% set ranks = [('Iron','Iron'),('Bronze','Bronze'),('Silver','Silver'),('Gold','Gold'),('Platinum','Platinum'),('Diamond','Diamond'),('Ascendant','Ascendant'),('Immortal','Immortal'),('Radiant','Radiant')] %}
 {% for i in range(1,6) %}
 <fieldset class="rank-picker"><legend>Oyuncu {{ i }}{% if i == 1 %} · Kaptan{% endif %}</legend><div class="rank-options">
 {% for value,label in ranks %}<label class="rank-option"><input type="radio" name="rank{{ i }}" value="{{ value }}" {% if value == 'Unranked' %}checked{% endif %}><span class="rank-choice"><img src="{{ url_for('static', filename='ranks/' ~ value|lower ~ '.svg') }}" alt=""><strong>{{ label }}</strong></span></label>{% endfor %}
