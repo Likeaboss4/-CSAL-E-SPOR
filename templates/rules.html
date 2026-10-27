@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Turnuva Kuralları | ŞCSAL E-Spor{% endblock %}
+{% block content %}
+<section class="page-intro">
+  <p class="kicker">ŞCSAL · VALORANT</p>
+  <h1>TURNUVA KURALLARI<span>.</span></h1>
+  <p>Turnuvaya katılan tüm oyuncular aşağıdaki kurallara uymakla yükümlüdür.</p>
+</section>
+<section class="rules-page">
+  <article class="rule-item"><h2>1. Öğrenci Şartı</h2><p>Turnuvaya yalnızca Şehit Cengiz Sarıbaş Anadolu Lisesi'nin aktif öğrencileri katılabilir. Okul dışından katılımcı kabul edilmeyecektir.</p></article>
+  <article class="rule-item"><h2>2. Karma Takımlar</h2><p>Takımlar sınıflardan bağımsızdır; farklı sınıf ve şubelerden öğrenciler serbestçe birleşerek takım kurabilir.</p></article>
+  <article class="rule-item"><h2>3. Kadro Yapısı</h2><p>Takımlar <strong>5 Asıl</strong> ve en fazla <strong>1 Yedek</strong> oyuncudan oluşur. Her takımın iletişimi sağlamak üzere bir Takım Kaptanı olması zorunludur.</p></article>
+  <article class="rule-item"><h2>4. Zamanında Hazır Olma</h2><p>Takımların belirlenen maç saatinden <strong>10 dakika önce</strong> lobide hazır bulunması zorunludur. Maç saatinde tam kadro lobiye katılmayan takım doğrudan hükmen mağlup sayılır.</p></article>
+  <article class="rule-item"><h2>5. Saygı ve Toksiklik Yasağı</h2><p>Oyun içi yazılı veya sesli sohbetten rakibe, takım arkadaşına veya organizatörlere küfür, hakaret ve kışkırtıcı söylemlerde ("Ez", "diff" vb.) bulunmak <strong>doğrudan elenme</strong> sebebidir.</p></article>
+  <article class="rule-item"><h2>6. Uygunsuz İsimler</h2><p>Okul disiplin yönetmeliğine, genel ahlaka aykırı veya siyasi/dini içerikli oyuncu adları ve takım isimleri kullanılamaz.</p></article>
+  <article class="rule-item"><h2>7. Dışarıdan Oyuncu Yasağı (Smurf)</h2><p>Okul dışından birini maça sokmak veya başkasının hesabıyla oynamak kesinlikle yasaktır. Tespiti halinde takım diskalifiye edilir.</p></article>
+  <article class="rule-item"><h2>8. Hile ve Açık Kullanımı (Exploit)</h2><p>3. parti hile yazılımları kullanmak veya oyundaki harita/karakter hatalarından (bug) haksız avantaj sağlamak anında <strong>diskalifiye</strong> sebebidir. Maç esnasında veya sonrasında hile/usulsüzlük şüphesi oluşması durumunda, Turnuva Komitesi oyun içi tekrar (replay) sisteminden, gözlemci kayıtlarından ve oyuncuların video görüntülerinden detaylı inceleme yapabilirler.</p></article>
+  <article class="rule-item"><h2>9. Mola (Pause) Hakkı</h2><p><strong>Taktiksel Mola:</strong> Her takımın harita başına <strong>2 adet (yarı başına 1 adet, 60'ar saniye)</strong> taktiksel mola hakkı vardır.</p><p><strong>Teknik Mola:</strong> Yalnızca <strong>oyuncu düşmesi (bağlantı kopması)</strong> durumunda takımların harita başına <strong>1 defaya mahsus (toplam en fazla 10 dakika)</strong> teknik bekleme hakkı vardır. Süre dolduğunda oyuncu gelemezse maç 4v5 devam eder.</p></article>
+  <article class="rule-item"><h2>10. Kişisel Bağlantı Sorumluluğu</h2><p>İnternet veya elektrik kesintilerinde sorumluluk oyuncuya aittir. Mola süresi dolduğunda gelmeyen oyuncunun yerine maç 4v5 devam eder.</p></article>
+  <article class="rule-item"><h2>11. İtiraz Hakkı</h2><p>Kural ihlali iddiaları, maç bitiminden sonraki ilk 15 dakika içinde ekran görüntüsü veya video kaydı kanıtı ile yapılmalıdır. Kanıtsız itirazlar dikkate alınmaz.</p></article>
+  <article class="rule-item"><h2>12. İletişim ve Denetim (Gözlemci/Koç)</h2><p>Adil oyun ortamını sağlamak ve saygı kurallarını denetlemek amacıyla Turnuva Komitesi üyelerinden veya sorumlu öğretmenlerden bir kişi, maç esnasında takım içi sesli/yazılı iletişimi gözlemlemek üzere gözlemci koç olarak takıma katılacaktır.</p></article>
+  <article class="rule-item"><h2>13. Karar Yetkisi</h2><p>Şartnamede yer almayan özel durumlarda son karar yetkisi turnuva komitesine ve sorumlu öğretmenlere aittir.</p></article>
+</section>
+<a class="btn" href="{{ url_for('index') }}">← Turnuvaya dön</a>
+{% endblock %}
