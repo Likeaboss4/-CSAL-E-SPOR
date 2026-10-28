@@ -13,5 +13,27 @@
 {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}<div class="notice {{ category }}">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}
 {% block content %}{% endblock %}
 </main>
-<footer><span>ŞCSAL E-SPOR VALORANT TURNUVASI</span><span>BO3 · Eleme Usulü</span><span>by Yusuf Gönüllü</span></footer>
+<footer><span>ŞCSAL E-SPOR VALORANT TURNUVASI</span><span>BO3 · Eleme Usulü</span><button class="developer-link" type="button" id="developer-open">by Yusuf Gönüllü</button></footer>
+<div class="developer-modal" id="developer-modal" hidden>
+  <div class="developer-backdrop" data-developer-close></div>
+  <section class="developer-card" role="dialog" aria-modal="true" aria-labelledby="developer-title">
+    <button class="developer-close" type="button" aria-label="Kapat" data-developer-close>×</button>
+    <div class="developer-mark">Y<span>.</span></div>
+    <p class="kicker">SİTE GELİŞTİRİCİSİ</p>
+    <h2 id="developer-title">Yusuf Gönüllü</h2>
+    <p>Bu site, ŞCSAL E-SPOR VALORANT Turnuvası için tasarlandı ve geliştirildi.</p>
+    <div class="developer-tag">ŞCSAL E-SPOR · GG WP</div>
+  </section>
+</div>
+<script>
+(() => {
+  const modal = document.getElementById('developer-modal');
+  const open = document.getElementById('developer-open');
+  if (!modal || !open) return;
+  const close = () => { modal.hidden = true; document.body.classList.remove('modal-open'); open.focus(); };
+  open.addEventListener('click', () => { modal.hidden = false; document.body.classList.add('modal-open'); modal.querySelector('.developer-close').focus(); });
+  modal.querySelectorAll('[data-developer-close]').forEach(el => el.addEventListener('click', close));
+  document.addEventListener('keydown', event => { if (event.key === 'Escape' && !modal.hidden) close(); });
+})();
+</script>
 </body></html>
