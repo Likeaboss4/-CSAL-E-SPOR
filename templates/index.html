@@ -36,6 +36,6 @@
 </section>
 {% endif %}
 <section class="section-head"><div><p class="kicker">03 / KATILIMCILAR</p><h2>Takımlar</h2></div><span class="pill">{{ teams|length }} ONAYLI TAKIM</span></section>
-{% if teams %}<div class="team-grid">{% for t in teams %}<article class="team-tile" {% if t.team_color %}style="border-top:3px solid {{ t.team_color }}"{% endif %}><span class="team-index">{{ "%02d"|format(loop.index) }}</span><h3>{{ ("Takım " ~ t.team_number) if t.team_number else "Numara bekleniyor" }}</h3><p>Turnuva katılımcısı</p></article>{% endfor %}</div>{% else %}<div class="empty-state">Henüz onaylanmış takım yok. İlk takımını başvuruyla kaydet.</div>{% endif %}
+{% if teams %}<div class="team-grid">{% for t in teams %}<article class="team-tile" {% if t.team_color %}style="border-top:3px solid {{ t.team_color }}"{% endif %}><span class="team-index">{{ "%02d"|format(loop.index) }}</span><h3>{{ ("Takım " ~ t.team_number) if t.team_number else "Numara bekleniyor" }}</h3><ul class="team-players">{% for player in [t.player1, t.player2, t.player3, t.player4, t.player5] %}<li>{{ player }}</li>{% endfor %}<li class="team-substitute"><span>Yedek:</span> {{ t.substitute }}</li></ul></article>{% endfor %}</div>{% else %}<div class="empty-state">Henüz onaylanmış takım yok. İlk takımını başvuruyla kaydet.</div>{% endif %}
 
 {% endblock %}
