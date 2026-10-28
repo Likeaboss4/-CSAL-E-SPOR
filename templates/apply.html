@@ -17,13 +17,13 @@
 <div class="player-rank-row">
 <label>Oyuncu {{ i }} adı ve soyadı *<input name="player{{ i }}" required maxlength="100"></label>
 <label>Peak Rank<select name="rank{{ i }}" required onchange="updateRankIcon(this)">{% for value,label in ranks %}<option value="{{ value }}" {% if value == 'Iron' %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
-<img class="rank-preview" src="{{ url_for('static', filename='ranks/iron.svg') }}" alt="Iron rank">
+<img class="rank-preview" src="https://media.valorant-api.com/competitivetiers/03621f52-342b-cf4e-4f86-9350a49c6d04/5/largeicon.png" alt="Iron rank">
 </div>
 {% endfor %}
 <div class="player-rank-row substitute-row">
 <label>Yedek oyuncu adı ve soyadı *<input name="substitute" required maxlength="100"></label>
 <label>Yedek Peak Rank<select name="substitute_rank" required onchange="updateRankIcon(this)">{% for value,label in ranks %}<option value="{{ value }}" {% if value == 'Iron' %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
-<img class="rank-preview" src="{{ url_for('static', filename='ranks/iron.svg') }}" alt="Iron rank">
+<img class="rank-preview" src="https://media.valorant-api.com/competitivetiers/03621f52-342b-cf4e-4f86-9350a49c6d04/5/largeicon.png" alt="Iron rank">
 </div>
 </section>
 <label class="full">Not (isteğe bağlı)<textarea name="note" rows="3" maxlength="500"></textarea></label>
@@ -33,8 +33,19 @@
 function updateRankIcon(select) {
   const row = select.closest('.player-rank-row');
   const img = row && row.querySelector('.rank-preview');
+  const rankTiers = {
+    Iron: 5,
+    Bronze: 8,
+    Silver: 11,
+    Gold: 14,
+    Platinum: 17,
+    Diamond: 20,
+    Ascendant: 23,
+    Immortal: 26,
+    Radiant: 27
+  };
   if (img) {
-    img.src = "{{ url_for('static', filename='ranks/') }}" + select.value.toLowerCase() + ".svg";
+    img.src = "https://media.valorant-api.com/competitivetiers/03621f52-342b-cf4e-4f86-9350a49c6d04/" + rankTiers[select.value] + "/largeicon.png";
     img.alt = select.value + " rank";
   }
 }
