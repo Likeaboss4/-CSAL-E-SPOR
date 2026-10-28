@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import random
 from pathlib import Path
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 
@@ -306,6 +307,21 @@ def admin():
                     con.execute("UPDATE teams SET team_number=NULL WHERE team_number=? AND id<>?", (number,tid)) if number is not None else None
                     con.execute("UPDATE teams SET team_number=? WHERE id=?", (number,tid))
                     flash("Takım numarası güncellendi.", "success")
+                elif action == "random_draw":
+                    approved = con.execute("SELECT id FROM teams WHERE status='approved' ORDER BY id").fetchall()
+                    if len(approved) != 8:
+                        raise ValueError("Kura çekmek için tam 8 onaylı takım olmalı.")
+                    completed_first = con.execute("SELECT COUNT(*) AS count FROM matches WHERE round_no=1 AND status='completed'").fetchone()["count"]
+                    later_teams = con.execute("SELECT COUNT(*) AS count FROM matches WHERE round_no IN (2,3) AND (team_a IS NOT NULL OR team_b IS NOT NULL)").fetchone()["count"]
+                    if completed_first or later_teams:
+                        raise ValueError("Kura çekmeden önce ilk tur sonuçlarını ve sonraki turlara aktarılmış takımları yönetimden sıfırlayın. Yarı final ve final otomatik değiştirilmez.")
+                    team_ids = [row["id"] for row in approved]
+                    random.SystemRandom().shuffle(team_ids)
+                    for slot in range(1, 5):
+                        team_a, team_b = team_ids[(slot - 1) * 2], team_ids[(slot - 1) * 2 + 1]
+                        con.execute("""UPDATE matches SET team_a=?,team_b=?,score_a=NULL,score_b=NULL,
+                            status='upcoming' WHERE round_no=1 AND slot_no=?""", (team_a, team_b, slot))
+                    flash("Kura çekildi! İlk turdaki 4 eşleşme rastgele belirlendi. Yarı final ve final değiştirilmedi.", "success")
                 elif action == "save_match":
                     rnd, slot = int(request.form["round_no"]), int(request.form["slot_no"])
                     ta, tb = request.form.get("team_a") or None, request.form.get("team_b") or None
